@@ -88,4 +88,15 @@ instacart %>%
   knitr::kable()
 ```
 
+# Problem 2
 
+**Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).**
+
+Load data
+```{r}
+accel_df = read_csv("./accel_data.csv") %>% 
+  janitor::clean_names()
+```
+
+ 
+ 
