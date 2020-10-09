@@ -92,7 +92,7 @@ instacart %>%
 
 **Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).**
 
-Load data
+Load data & Tidy the data appropriately
 ```{r}
 accel_df = read_csv("./accel_data.csv") %>% 
   janitor::clean_names() %>% 
@@ -108,9 +108,22 @@ accel_df = read_csv("./accel_data.csv") %>%
   mutate(
     minute = as.factor(minute)
   ) %>% mutate(
-  weekday = if_else(day %in% c("Saturday", "Sunday"), "FALSE", "TRUE"))
-  
+  weekday = if_else(day %in% c("Saturday", "Sunday"), "FALSE", "TRUE")) %>% 
+  mutate(weekday = as.factor(weekday)
+         )
 ```
 
+```{r}
+summary(accel_df)
+```
+
+ The accelerometer data includes the variables: `r names(accel_df)`.  There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks.
  
+aggregate across minutes to create a total activity variable for each day,
+
+```{r}
+accel_df 
+
+
+```
  
