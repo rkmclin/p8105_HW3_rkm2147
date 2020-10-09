@@ -134,6 +134,7 @@ accel_df %>%
 ```
  **From the created table, we can see a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week**
 
+*how to sort weekdays in the table?
 
 ```{r}
 
@@ -156,7 +157,22 @@ data("ny_noaa")
 
 ```{r}
 ny_noaa %>% 
-  separate(date, into = c("year","month","day", convert = TRUE))
-
+  separate(date, into = c("year","month","day")) %>% 
+  mutate(
+   tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin)
+  ) %>% 
+  mutate(
+    prcp = prcp * 10,
+    tmax = tmax * 10,
+    tmin = tmin * 10
+  ) %>% 
+  group_by(prcp, month) %>% 
+  summarize(
+    mean_prcp = mean(prcp, na.rm = TRUE)
+  ) %>% 
+  knitr::kable()
 ```
 
+tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin),
