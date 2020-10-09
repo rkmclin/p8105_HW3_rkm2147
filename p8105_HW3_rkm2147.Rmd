@@ -106,7 +106,7 @@ accel_df = read_csv("./accel_data.csv") %>%
       values_to = "value"
   ) %>% 
   mutate(
-    minute = as.factor(minute)
+    minute = as.numeric(minute)
   ) %>% mutate(
   weekday = if_else(day %in% c("Saturday", "Sunday"), "FALSE", "TRUE")) %>% 
   mutate(weekday = as.factor(weekday)
@@ -138,6 +138,25 @@ accel_df %>%
 ```{r}
 
 accel_df %>% 
-ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth()
+ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth(aes(group = day))
+```
+
+tmax tmin should be numeric
+
+# Problem 3
+
+ separate(date, into = c("year","month","day", convert = TRUE))
+
+Load data, this has over 2 million observations. Contains lots of information!
+```{r}
+library(p8105.datasets)
+data("ny_noaa") 
+```
+
+
+```{r}
+ny_noaa %>% 
+  separate(date, into = c("year","month","day", convert = TRUE))
+
 ```
 
