@@ -132,5 +132,12 @@ accel_df %>%
   knitr::kable()
 
 ```
- **From the created table, we can can a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week**
+ **From the created table, we can see a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week**
+
+
+```{r}
+
+accel_df %>% 
+ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth()
+```
 
