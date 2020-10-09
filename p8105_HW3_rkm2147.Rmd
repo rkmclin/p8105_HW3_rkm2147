@@ -110,7 +110,13 @@ accel_df = read_csv("./accel_data.csv") %>%
   ) %>% mutate(
   weekday = if_else(day %in% c("Saturday", "Sunday"), "FALSE", "TRUE")) %>% 
   mutate(weekday = as.factor(weekday)
-         )
+         ) %>%
+  mutate(
+    day =  
+  forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday","Friday","Saturday", "Sunday"))
+  )
+  
+ 
 ```
 
 ```{r}
@@ -142,11 +148,9 @@ accel_df %>%
 ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth(aes(group = day))
 ```
 
-tmax tmin should be numeric
 
 # Problem 3
 
- separate(date, into = c("year","month","day", convert = TRUE))
 
 Load data, this has over 2 million observations. Contains lots of information!
 ```{r}
@@ -163,16 +167,42 @@ ny_noaa %>%
     tmin = as.numeric(tmin)
   ) %>% 
   mutate(
-    prcp = prcp * 10,
-    tmax = tmax * 10,
-    tmin = tmin * 10
+    prcp = prcp / 10,
+    tmax = tmax / 10,
+    tmin = tmin / 10
   ) %>% 
-  group_by(prcp, month) %>% 
-  summarize(
-    mean_prcp = mean(prcp, na.rm = TRUE)
-  ) %>% 
+  	group_by(month) %>% 
+	count(snow) %>% 
+	mutate(rank = min_rank(desc(snow))) %>% 
+  filter(rank < 5) %>% 
   knitr::kable()
 ```
 
-tmax = as.numeric(tmax),
-    tmin = as.numeric(tmin),
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+```{r}
+ny_noaa %>% 
+  select(month, tmax, year) %>% 
+  group_by(month, year) %>% 
+  filter(month %in% c(1,7)) %>% 
+  drop_na() %>% 
+  summarize(mean_tmax = mean(tmax)) %>% 
+  ggplot(aes(x = year, y = mean_tmax)) + geom_point() + geom_smooth() +
+  labs(
+    title = "jan and july average",
+    x = "year",
+    y = "data"
+  ) +
+  facet_grid(~month, scales = "free_y")
+```
+
+
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+```{r}
+ny_noaa %>% 
+  select(year, tmax, tmin) %>% 
+  drop_na (tmax,tmin) %>% 
+  ggplot(aes(x = tmax, y = tmin)) + geom_bin2d()
+```
+
