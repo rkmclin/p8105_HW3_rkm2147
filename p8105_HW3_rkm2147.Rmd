@@ -119,11 +119,18 @@ summary(accel_df)
 
  The accelerometer data includes the variables: `r names(accel_df)`.  There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks.
  
-aggregate across minutes to create a total activity variable for each day,
+
 
 ```{r}
-accel_df 
-
+accel_df %>% 
+  group_by(day, week) %>% 
+  summarize(sum_value = sum(value)) %>%
+  pivot_wider(
+    names_from = day,
+    values_from = sum_value
+  ) %>% 
+  knitr::kable()
 
 ```
- 
+ **From the created table, we can can a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week**
+
