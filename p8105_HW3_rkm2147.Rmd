@@ -9,6 +9,8 @@ author: Ronae McLin rkm2147
 ```{r}
 library(tidyverse)
 library(patchwork)
+library(ggridges)
+
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -52,7 +54,11 @@ instacart %>%
 instacart %>% 
   count(aisle) %>% 
   filter(n > 10000) %>% 
-  ggplot(aes( x = aisle, y = n)) + geom_point() + theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1))
+  ggplot(aes( x = aisle, y = n)) + geom_point() + theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1)) + labs(
+    title = "items ordered from each aisle",
+    x = "aisle",
+    y = "number of items"
+  )
 ```
 
 **A table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.**
@@ -84,7 +90,7 @@ instacart %>%
 
 # Problem 2
 
-**Load data & Tidy the data appropriately **
+Load data & tidy the data appropriately 
 ```{r}
 accel_df = read_csv("./accel_data.csv") %>% 
   janitor::clean_names() %>% 
@@ -114,7 +120,7 @@ accel_df = read_csv("./accel_data.csv") %>%
 
 **The accelerometer data describes information collected on a 63 year-old male with congesitve heart failure. This data includes the variables: `r names(accel_df)`. The weekday variable describes if observations occurred during the weekday (Mon-Fri) or during the weekend (Sat-Sun). There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks. There are 1440 minutes in a 24 hour period, so the amount of observations seems appropriate**
  
-
+Create activity table based on weeks
 ```{r}
 accel_df %>% 
   group_by(day, week) %>% 
@@ -128,10 +134,15 @@ accel_df %>%
 ```
  **From the created table, we can see a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week.**
 
+
 ```{r}
 
 accel_df %>% 
-ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth(aes(group = day))
+ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth(aes(group = day)) + labs(
+    title = "Distribution of activitiy levels over a 24 period for the course of a week",
+    x = "minutes",
+    y = "activity values"
+  )
 ```
 
 **From the observed plot, we can see that at the start of the 24 hour period, activity is considerably low.  We can assume that this is during a period of rest/sleep.  As the day progresses, activity level increases appropriately, with a surge towards the end of the recording period.**
@@ -144,63 +155,82 @@ library(p8105.datasets)
 data("ny_noaa") 
 ```
 
-**The NY NOAA is a large data set containing information for all New York state weather stations from January 1, 1981 through December 31, 2010. Each weather station may collect only a subset of these variables, and therefore the resulting dataset contains extensive missing data. Variables include `r names(ny_noaa)`. There are a total of `r nrow(ny_noaa)` rows.** 
+**The NY NOAA is a large data set containing information for all New York state weather stations from January 1, 1981 through December 31, 2010. Each weather station may collect only a subset of these variables, and therefore the resulting dataset contains extensive missing data. Variables include: `r names(ny_noaa)`. There are a total of `r nrow(ny_noaa)` rows.** 
 
+Load data, split the date variable, and make appropriate class changes
 
 ```{r}
-ny_noaa = ny_noaa %>% 
-separate(date, into = c("year", "month", "day"), convert = TRUE)
+weather_df = ny_noaa %>% 
+separate(date, into = c("year", "month", "day"))  %>% 
+  mutate(tmax = as.numeric(tmax)) %>% 
+  mutate(tmin = as.numeric(tmin)) %>% 
+  mutate(year = as.factor(year)) %>% 
+  mutate(month = as.factor(month)) %>%
+  mutate(id = as.factor(id)) %>% 
+  mutate(
+    prcp = prcp/10,
+    tmax = tmax/10,
+    tmin = tmin/10
+  ) 
 ```
 
 
+Snow fall code chunk
 ```{r}
-ny_noaa %>% 
-  mutate(
-   tmax = as.numeric(tmax),
-    tmin = as.numeric(tmin)
-  ) %>% 
-  mutate(
-    prcp = prcp / 10,
-    tmax = tmax / 10,
-    tmin = tmin / 10
-  ) %>% 
-  	group_by(month) %>% 
-	count(snow) %>% 
-	mutate(rank = min_rank(desc(snow))) %>% 
-  filter(rank < 5) %>%
-  knitr::kable()
+weather_df %>% 
+  count(month, year,snow) %>% 
+  group_by(month, year) 
 ```
 
+**For snowfall, the most commonly observed value is 0, this makes sense since it doesn't snow all year round in most places due to the seasonality of climate.**
 
-Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+Two panel plot
 
 ```{r}
-ny_noaa %>% 
-  mutate(
-   tmax = as.numeric(tmax),
-    tmin = as.numeric(tmin)
-  )%>% 
-  select(month, tmax, year) %>% 
-  group_by(month, year) %>% 
-  filter(month %in% c(1,7)) %>% 
-  drop_na() %>% 
-  summarize(mean_tmax = mean(tmax)) %>% 
-  ggplot(aes(x = year, y = mean_tmax)) + geom_point() + geom_smooth() +
+weather_df %>% 
+  filter(month %in% c("01","07")) %>% 
+  group_by(id, month, year) %>% 
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = mean_tmax, color = month)) + geom_path() + geom_point() +
   labs(
-    title = "jan and july average",
-    x = "year information",
-    y = "data i need"
+    title = "Average max temperature across the years January vs July",
+    x = "year",
+    y = "average max temperatures"
   ) +
-  facet_grid(~month, scales = "free_y")
+  facet_grid(~month) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
+**Observations across the years appear to be constant for both the months of January and July. However for the month of January, there is a noticeable increase in the average max temperature between the period of 1980 to 1990. As expected, the average max temperature is greater for the month of July compared to January. There are a few outliers of significance I notice on the plot, but I don't interpret them to be extreme in nature.  The most noticeable trend being that there is more spread of the data points within January.**
 
-Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
 ```{r}
-ny_noaa %>% 
+temp_plot = 
+weather_df %>% 
   select(year, tmax, tmin) %>% 
   drop_na(tmax,tmin) %>% 
-  ggplot(aes(x = tmax, y = tmin)) + geom_bin2d()
+  ggplot(aes(x = tmax, y = tmin)) + geom_hex() + labs(
+    title = "The max and min temperatures across the NY NOAA dataset",
+    x = "Maximum temperature",
+    y = "Minimum temperature"
+  ) + theme(legend.position = "right")
 ```
 
+
+```{r}
+snow_plot = 
+  weather_df %>% 
+  select(snow, year) %>% 
+  drop_na(snow) %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = year, y = snow)) + geom_violin() + labs(
+    title = "the distribution of snowfall values greater than 0 and less than 100 by year",
+    x = "year",
+    y = "snowfall in mm"
+  ) + theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1))
+```
+
+```{r}
+snow_plot + temp_plot
+```
+
+**Snow fall across the years is appropriate considering the seasonality associated with NY state. We also see that as the maximum temperature increases, the minimum increases as well.  This is displaying a positive correlation between the two variables.**
