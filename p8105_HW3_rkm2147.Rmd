@@ -90,7 +90,7 @@ instacart %>%
 
 # Problem 2
 
-Load data & tidy the data appropriately 
+**Load data & tidy the data appropriately** 
 ```{r}
 accel_df = read_csv("./accel_data.csv") %>% 
   janitor::clean_names() %>% 
@@ -118,9 +118,9 @@ accel_df = read_csv("./accel_data.csv") %>%
 ```
 
 
-**The accelerometer data describes information collected on a 63 year-old male with congesitve heart failure. This data includes the variables: `r names(accel_df)`. The weekday variable describes if observations occurred during the weekday (Mon-Fri) or during the weekend (Sat-Sun). There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks. There are 1440 minutes in a 24 hour period, so the amount of observations seems appropriate**
+**The accelerometer data describes information collected on a 63 year-old male with congesitve heart failure. This data includes the variables: `r names(accel_df)`. The weekday variable describes if observations occurred during the weekday (Mon-Fri) or during the weekend (Sat-Sun). There are a total of `r nrow(accel_df)` rows of observations for this frame. Observations were collected for a total of 5 weeks. There are 1440 minutes in a 24 hour period, so the amount of observations seems appropriate**
  
-Create activity table based on weeks
+*Create activity table based on weeks*
 ```{r}
 accel_df %>% 
   group_by(day, week) %>% 
@@ -142,7 +142,7 @@ ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alph
     title = "Distribution of activitiy levels over a 24 period for the course of a week",
     x = "minutes",
     y = "activity values"
-  )
+  ) + theme(plot.title = element_text(size = 10))
 ```
 
 **From the observed plot, we can see that at the start of the 24 hour period, activity is considerably low.  We can assume that this is during a period of rest/sleep.  As the day progresses, activity level increases appropriately, with a surge towards the end of the recording period.**
@@ -157,7 +157,7 @@ data("ny_noaa")
 
 **The NY NOAA is a large data set containing information for all New York state weather stations from January 1, 1981 through December 31, 2010. Each weather station may collect only a subset of these variables, and therefore the resulting dataset contains extensive missing data. Variables include: `r names(ny_noaa)`. There are a total of `r nrow(ny_noaa)` rows.** 
 
-Load data, split the date variable, and make appropriate class changes
+*Load data, split the date variable, and make appropriate class changes*
 
 ```{r}
 weather_df = ny_noaa %>% 
@@ -175,7 +175,7 @@ separate(date, into = c("year", "month", "day"))  %>%
 ```
 
 
-Snow fall code chunk
+*Snow fall code chunk*
 ```{r}
 weather_df %>% 
   count(month, year,snow) %>% 
@@ -184,8 +184,7 @@ weather_df %>%
 
 **For snowfall, the most commonly observed value is 0, this makes sense since it doesn't snow all year round in most places due to the seasonality of climate.**
 
-Two panel plot
-
+*Creating a two panel plot*
 ```{r}
 weather_df %>% 
   filter(month %in% c("01","07")) %>% 
@@ -212,7 +211,7 @@ weather_df %>%
     title = "The max and min temperatures across the NY NOAA dataset",
     x = "Maximum temperature",
     y = "Minimum temperature"
-  ) + theme(legend.position = "right")
+  ) + theme(legend.position = "right", plot.title = element_text(size = 5))
 ```
 
 
@@ -226,7 +225,7 @@ snow_plot =
     title = "the distribution of snowfall values greater than 0 and less than 100 by year",
     x = "year",
     y = "snowfall in mm"
-  ) + theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1))
+  ) + theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1), plot.title = element_text(size = 5))
 ```
 
 ```{r}
