@@ -158,10 +158,14 @@ library(p8105.datasets)
 data("ny_noaa") 
 ```
 
+```{r}
+ny_noaa = ny_noaa %>% 
+separate(date, into = c("year", "month", "day"), convert = TRUE)
+```
+
 
 ```{r}
 ny_noaa %>% 
-  separate(date, into = c("year","month","day")) %>% 
   mutate(
    tmax = as.numeric(tmax),
     tmin = as.numeric(tmin)
@@ -174,14 +178,19 @@ ny_noaa %>%
   	group_by(month) %>% 
 	count(snow) %>% 
 	mutate(rank = min_rank(desc(snow))) %>% 
-  filter(rank < 5) %>% 
+  filter(rank < 5) %>%
   knitr::kable()
 ```
+
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
 
 ```{r}
 ny_noaa %>% 
+  mutate(
+   tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin)
+  )%>% 
   select(month, tmax, year) %>% 
   group_by(month, year) %>% 
   filter(month %in% c(1,7)) %>% 
@@ -190,8 +199,8 @@ ny_noaa %>%
   ggplot(aes(x = year, y = mean_tmax)) + geom_point() + geom_smooth() +
   labs(
     title = "jan and july average",
-    x = "year",
-    y = "data"
+    x = "year information",
+    y = "data i need"
   ) +
   facet_grid(~month, scales = "free_y")
 ```
