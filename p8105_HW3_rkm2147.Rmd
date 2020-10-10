@@ -35,13 +35,7 @@ data("instacart")
 ```
 
 
-
-- and giving illustrative examples of observations. Then, do or answer the following (commenting on the results of each):
-
-
-
-Instacart is a online service that allows for users to shop locally from vairous stores that can then be delivered within NYC. There are a totla of 1,384,617 observations contained within this data.
-This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Observations are the level of items in orders by user. Variables include: `r names(instacart)`. 
+Instacart is an online service that allows for users to shop locally from various stores that can then be delivered within NYC. There are a total of 1,384,617 observations contained within this dataset. This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Observations are the level of items in orders by user. Variables include: `r names(instacart)`. 
 
 **There are 134 aisles, and aisles in which the top 3 most ordered items are ordered from are fresh vegetables, fresh fruits, and packaged vegetables & fruits** 
 
@@ -90,9 +84,7 @@ instacart %>%
 
 # Problem 2
 
-**Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).**
-
-Load data & Tidy the data appropriately
+**Load data & Tidy the data appropriately **
 ```{r}
 accel_df = read_csv("./accel_data.csv") %>% 
   janitor::clean_names() %>% 
@@ -119,13 +111,9 @@ accel_df = read_csv("./accel_data.csv") %>%
  
 ```
 
-```{r}
-summary(accel_df)
-```
 
- The accelerometer data includes the variables: `r names(accel_df)`.  There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks.
+**The accelerometer data describes information collected on a 63 year-old male with congesitve heart failure. This data includes the variables: `r names(accel_df)`. The weekday variable describes if observations occurred during the weekday (Mon-Fri) or during the weekend (Sat-Sun). There are a total of `r nrow(accel_df)` observations for this frame. Observations were collected for a total of 5 weeks. There are 1440 minutes in a 24 hour period, so the amount of observations seems appropriate**
  
-
 
 ```{r}
 accel_df %>% 
@@ -138,9 +126,7 @@ accel_df %>%
   knitr::kable()
 
 ```
- **From the created table, we can see a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week**
-
-*how to sort weekdays in the table?
+ **From the created table, we can see a trend that the sum of activity is the lowest on saturdays, notably during the fourth and fifth week.**
 
 ```{r}
 
@@ -148,15 +134,18 @@ accel_df %>%
 ggplot(aes(x = minute, y = value, color = day, group = day_id)) + geom_line(alpha = .4) + geom_smooth(aes(group = day))
 ```
 
+**From the observed plot, we can see that at the start of the 24 hour period, activity is considerably low.  We can assume that this is during a period of rest/sleep.  As the day progresses, activity level increases appropriately, with a surge towards the end of the recording period.**
 
 # Problem 3
 
 
-Load data, this has over 2 million observations. Contains lots of information!
 ```{r}
 library(p8105.datasets)
 data("ny_noaa") 
 ```
+
+**The NY NOAA is a large data set containing information for all New York state weather stations from January 1, 1981 through December 31, 2010. Each weather station may collect only a subset of these variables, and therefore the resulting dataset contains extensive missing data. Variables include `r names(ny_noaa)`. There are a total of `r nrow(ny_noaa)` rows.** 
+
 
 ```{r}
 ny_noaa = ny_noaa %>% 
@@ -211,7 +200,7 @@ Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a
 ```{r}
 ny_noaa %>% 
   select(year, tmax, tmin) %>% 
-  drop_na (tmax,tmin) %>% 
+  drop_na(tmax,tmin) %>% 
   ggplot(aes(x = tmax, y = tmin)) + geom_bin2d()
 ```
 
